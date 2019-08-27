@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { Component, Fragment } from 'react';
+import api from './services/api';
 
-const App = () => {
-  return (
-    <div>
-      <h1>Hello World</h1>
-    </div>
-  );
-};
+class App extends Component {
+  async componentDidMount() {
+    const res = await api.call('post', 'auth/login', {
+      username: 'username',
+      password: 'passssword'
+    });
+
+    console.log(res);
+  }
+
+  render() {
+    return <Fragment>Hello world</Fragment>;
+  }
+}
 
 export default App;
