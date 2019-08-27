@@ -17,7 +17,7 @@ exports.getAllPolls = catchAsync(async (req, res, next) => {
 });
 
 exports.createPoll = catchAsync(async (req, res, next) => {
-  const { question, answers } = req.body;
+  const { question, options } = req.body;
 
   const user = await User.findById(req.user.id);
 
@@ -28,7 +28,7 @@ exports.createPoll = catchAsync(async (req, res, next) => {
   const newPoll = await Poll.create({
     question,
     user,
-    answers: answers.map(answer => ({
+    options: options.map(answer => ({
       answer,
       votes: 0
     }))
@@ -90,26 +90,28 @@ exports.deletePoll = catchAsync(async (req, res, next) => {
 });
 
 exports.votePoll = catchAsync(async (req, res, next) => {
-  const { answer } = req.body;
+  const { option } = req.body;
 
-  if (!answer) return next(new AppError('Please provide an answer', 400));
+  if (!option) return next(new AppError('Please provide an option', 400));
 
   const user = await User.findById(req.user.id);
 
   const poll = await Poll.findById(req.params.id);
 
-  user.polls = await user.polls.filter(poll => poll.toString() === req.params.id);
+  user.polls = await user.polls.filter(
+    poll => poll.toString() === req.params.id
+  );
 
   if (!poll) return next(new AppError('No poll found with that ID', 404));
 
-  const vote = poll.answers.map(ans =>
-    ans.answer === answer
+  const vote = poll.options.map(option =>
+    option.option === option
       ? {
-          _id: ans._id,
-          answer: ans.answer,
-          votes: ans.votes + 1
+          _id: option._id,
+          option: option.option,
+          votes: option.votes + 1
         }
-      : ans
+      : option
   );
 
   if (poll.voted.filter(user => user.toString() === req.user.id).length >= 1) {
@@ -117,10 +119,10 @@ exports.votePoll = catchAsync(async (req, res, next) => {
   }
 
   poll.voted.push(req.user.id);
-  poll.answers = vote;
+  poll.options = vote;
 
   await poll.save();
-  await user.save()
+  await user.save();
 
   res.status(200).json({
     status: 'success',

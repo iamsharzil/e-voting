@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const optionSchema = new mongoose.Schema({
-  answer: {
+  option: {
     type: String
   },
   votes: {
@@ -19,7 +19,7 @@ const pollSchema = new mongoose.Schema(
     questions: {
       type: String
     },
-    answers: [optionSchema],
+    options: [optionSchema],
     voted: [
       {
         type: mongoose.Schema.Types.ObjectId,
