@@ -6,6 +6,7 @@ const AppError = require('./utils/appError');
 const globalErroHandler = require('./controllers/errorController');
 
 const authRouter = require('./routes/authRoutes');
+const pollRouter = require('./routes/pollRoutes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/poll', pollRouter);
 
 // Handlers
 app.all('*', (req, res, next) => {

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const optionSchema = new mongoose.Schema({
-  options: {
+  answer: {
     type: String
   },
   votes: {
@@ -19,16 +19,32 @@ const pollSchema = new mongoose.Schema(
     questions: {
       type: String
     },
-    options: [optionSchema],
-    voted: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+    answers: [optionSchema],
+    voted: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      select: false
     }
   },
   {
-    timestamps: true
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
+
+pollSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'user',
+    select: 'username'
+  });
+  next();
+});
 
 const Poll = mongoose.model('Poll', pollSchema);
 
